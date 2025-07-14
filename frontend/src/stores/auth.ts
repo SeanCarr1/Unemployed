@@ -30,9 +30,17 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-    const login = async (username: string, password: string) => {
+    const register = async(email: string, username: string, password: string, role: string) => {
         try {
-            const res = await api.post<{ access: string, refresh: string }>('/token/', { username, password })
+            await api.post<{ access: string, refresh: string }>('/auth/users/', { email, username, password, role })
+        } catch(err: any) {
+            error.value = 'Invalid registration'
+        }
+    }
+
+    const login = async (email: string, password: string) => {
+        try {
+            const res = await api.post<{ access: string, refresh: string }>('/token/', { email, password })
             
             token.value = res.data.access
             refreshToken.value = res.data.refresh

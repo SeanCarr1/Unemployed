@@ -41,7 +41,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    "users.apps.UsersConfig"
+    "users.apps.UsersConfig",
+    "jobs.apps.JobsConfig",
+    "applications.apps.ApplicationsConfig",
+    "rest_framework.authtoken",
+    "djoser",
+
 ]
 
 MIDDLEWARE = [
@@ -147,6 +152,16 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE' : 10,
+}
+
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'SERIALIZERS': {
+        'user_create': 'users.serializers.UserSerializer',
+        'user': 'users.serializers.UserSerializer',
+        'current_user': 'users.serializers.UserSerializer',
+    },
 }
 
 

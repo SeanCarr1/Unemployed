@@ -4,13 +4,13 @@ import { ref } from 'vue';
 
 import { useAuthStore } from '@/stores/auth';
 
-const username = ref<string>('')    
+const email = ref<string>('')    
 const password = ref<string>('')
 const auth = useAuthStore()
 
 
 const handleLogin = async () => {
-    await auth.login(username.value, password.value)
+    await auth.login(email.value, password.value)
 }
 </script>
 
@@ -18,8 +18,8 @@ const handleLogin = async () => {
     <div>
         <h1>Login</h1>    
         <form v-if="!auth.user" @submit.prevent="handleLogin">
-            <label for="">Username</label>
-            <input v-model="username" type="text" required/>
+            <label for="">Email</label>
+            <input v-model="email" type="email" required/>
             <br/>
 
             <label for="">Password</label>
@@ -30,7 +30,7 @@ const handleLogin = async () => {
 
         <div v-if="auth.error" style="color: rebeccapurple;">{{ auth.error }}</div>
         <div v-if="auth.user">
-            <h2>Welcome {{ auth.user.username }}</h2>
+            <h2>Welcome {{ auth.user.email }}</h2>
             <p>Email: {{ auth.user.email }}</p>
         </div>
     </div>

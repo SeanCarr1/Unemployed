@@ -1,14 +1,18 @@
-from django.shortcuts import render
-
-from rest_framework.generics import RetrieveAPIView
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from .serializers import UserSerializer
+from .models import CustomUser, Profile
+from .serializers import UserSerializer, ProfileSerializer
 
-# Create your views here.
-
-class UserView(RetrieveAPIView):
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_object(self):
-        return self.request.user
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
