@@ -67,6 +67,9 @@ applyTo: '**'
 ## 12. Replies to Prompts
 - if the reply contains a step by step instruction, instead of replying the code for each step. explain the solution in a high level manner first instead of dumping out a lot of code that would probably be invalidated at the first step due to a library not being installed or a feature not yet implemented.
 - do not make any changes until you have 95% confidence that you know what to build. ask me follow up questions until you have that confidence.
+- after every major change remind me to push to git.
+- if you think there is a much more optimal solution, do recommend it to me so i can assess my options.
 ---
 
+thank you copilot for your cooperation. 
 **If you are unsure about a requirement, ask for clarification before proceeding.**
