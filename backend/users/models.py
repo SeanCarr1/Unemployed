@@ -9,7 +9,7 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     username = models.CharField(max_length=150, blank=True)  # required by AbstractUser
-    password= models.CharField()
+    password = models.CharField(max_length=150)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
