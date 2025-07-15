@@ -78,12 +78,14 @@ applyTo: '**'
 - For frontend, use Vitest or Jest for unit/integration tests.
 - Tests should focus on feature coverage, not every function.
 - Use API tools (Postman, curl) or temporary frontend helpers for rapid manual testing, but prioritize automated tests for reliability.
+- prefer writing tests that are focused on sending data through the api endpoints (POST requests), especially for CRUD operations since we implemented a frontend. Basically think of the test as coming from the front end but don't be confused. the tests are still written in the backend using the DRF testing.
 
 ## 14. Test Data Factories & Helpers
 - Use factory functions or libraries (e.g., factory_boy) for creating test data (users, jobs, etc.) in tests.
 - Centralize test data creation logic to avoid duplication and make tests easier to maintain.
 - If the model or creation logic changes, update the factory/helper, not every test.
 - Prefer using these helpers in all test setups for consistency and DRY code.
+
 
 thank you copilot for your cooperation. 
 
