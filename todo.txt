@@ -1,0 +1,8 @@
+- test login flow
+- develop jobs create and write tests
+- develop jobs retrieve and write tests
+- develop jobs edit and write tests
+- develop jobs delete and write tests
+
+- develop applications CRUD and write tests
+
