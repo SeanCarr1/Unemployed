@@ -14,6 +14,7 @@ class Job(models.Model):
         limit_choices_to={'role': 'employer'},
         related_name='posted_jobs'
     )
+    
     title = models.CharField(max_length=255)
     description = models.TextField()
     location = models.CharField(max_length=255)

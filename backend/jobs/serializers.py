@@ -11,4 +11,4 @@ class JobSerializer(serializers.ModelSerializer):
             'salary_min', 'salary_max', 'job_type',
             'posted_at', 'employer', 'employer_email'
         ]
-        read_only_fields = ['posted_at']
+        read_only_fields = ['posted_at', 'employer']
