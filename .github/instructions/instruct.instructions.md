@@ -71,5 +71,15 @@ applyTo: '**'
 - if you think there is a much more optimal solution, do recommend it to me so i can assess my options.
 ---
 
+## 13. Testing & TDD
+- Automated tests should be used for backend and frontend features.
+- Prefer test-driven development (TDD): write tests for expected inputs/outputs before implementing features.
+- For backend, use Django’s built-in testing framework.
+- For frontend, use Vitest or Jest for unit/integration tests.
+- Tests should focus on feature coverage, not every function.
+- Use API tools (Postman, curl) or temporary frontend helpers for rapid manual testing, but prioritize automated tests for reliability.
+
 thank you copilot for your cooperation. 
+
+
 **If you are unsure about a requirement, ask for clarification before proceeding.**
