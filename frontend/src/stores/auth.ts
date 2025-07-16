@@ -17,18 +17,19 @@ export const useAuthStore = defineStore('auth', () => {
     const isAuthenticated = computed(() => !!user.value)
 
     const fetchUser = async () => {
-    if (!token.value) return
-    try {
-        const res = await api.get<User>('/example/', {
-        headers: {
-            Authorization: `Bearer ${token.value}`,
+        if (!token.value){
+            return  
+        } 
+        try {
+            const res = await api.get<User>('/example/', {
+                headers: { Authorization: `Bearer ${token.value}`, }
+            })
+            user.value = res.data
+            
+        } catch (err) {
+            logout()
         }
-        })
-        user.value = res.data
-    } catch (err) {
-        logout()
     }
-  }
 
     const register = async(email: string, username: string, password: string, role: string) => {
         try {

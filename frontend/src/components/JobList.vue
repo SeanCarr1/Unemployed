@@ -1,84 +1,54 @@
 
 <script setup lang="ts">
 // JobList.vue: Fetches and displays all jobs, with actions for view, edit, and delete.
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '../api'
+import { useJobsStore } from '../stores/jobs'
 
-// Define the Job type based on your backend model fields
-interface Job {
-  id: number
-  title: string
-  description: string
-  location: string
-  salary_min: number
-  salary_max: number
-  job_type: string
-  posted_at: string
-  // employer: number | string // Uncomment if you want to display employer info
-}
-
-const jobs = ref<Job[]>([])
-const error = ref<string>('')
-const loading = ref<boolean>(true)
+const jobsStore = useJobsStore()
 const router = useRouter()
 
 // Fetch all jobs from the API on component mount
-onMounted(async () => {
-  try {
-    const response = await api.get<Job[]>('/jobs/')
-    jobs.value = response.data
-    error.value = ''
-  } catch (err: any) {
-    error.value = 'Failed to load jobs.'
-  } finally {
-    loading.value = false
-  }
+onMounted(() => {
+  jobsStore.fetchJobs()
 })
-
-// Navigate to the job detail page
 function viewJob(id: number) {
   router.push(`/jobs/${id}`)
 }
 
-// Navigate to the job edit page
 function editJob(id: number) {
   router.push(`/jobs/${id}/edit`)
 }
 
-// Delete a job with confirmation
 async function deleteJob(id: number) {
   if (!window.confirm('Are you sure you want to delete this job?')) return
   try {
-    await api.delete(`/jobs/${id}/`)
-    jobs.value = jobs.value.filter(job => job.id !== id)
-    error.value = ''
+    await jobsStore.deleteJob(id)
+    jobsStore.clearError()
   } catch (err: any) {
-    error.value = 'Failed to delete job.'
+    // error is set in store
   }
 }
 </script>
 
 <template>
-  <div>
-    <h2>Job List</h2>
-    <div v-if="error" style="color: red;">{{ error }}</div>
-    <div v-if="loading">Loading...</div>
+  <div class="p-4">
+    <h1 class="text-2xl font-bold mb-4">Job Listings</h1>
+    <div v-if="jobsStore.error" class="text-red-500">{{ jobsStore.error }}</div>
+    <div v-if="jobsStore.loading">Loading jobs...</div>
     <div v-else>
-      <div v-if="jobs.length === 0">No jobs found.</div>
-      <div v-for="job in jobs" :key="job.id" style="border: 1px solid #ccc; margin-bottom: 1rem; padding: 1rem;">
-        <h3>{{ job.title }}</h3>
-        <ul>
-          <li><strong>Description:</strong> {{ job.description }}</li>
-          <li><strong>Location:</strong> {{ job.location }}</li>
-          <li><strong>Salary:</strong> {{ job.salary_min }} - {{ job.salary_max }}</li>
-          <li><strong>Type:</strong> {{ job.job_type }}</li>
-          <li><strong>Posted At:</strong> {{ job.posted_at }}</li>
-        </ul>
-        <button @click="viewJob(job.id)">View</button>
-        <button @click="editJob(job.id)">Edit</button>
-        <button @click="deleteJob(job.id)">Delete</button>
-      </div>
+      <ul>
+        <li v-for="job in jobsStore.jobs" :key="job.id" class="mb-4 border-b pb-2">
+          <div class="font-semibold">{{ job.title }}</div>
+          <div>{{ job.location }} | {{ job.job_type }}</div>
+          <div>Salary: {{ job.salary_min }} - {{ job.salary_max }}</div>
+          <div class="text-sm text-gray-500">Posted by: {{ job.employer_email }}</div>
+          <button @click="viewJob(job.id)" class="text-blue-600 underline mr-2">View</button>
+          <button @click="editJob(job.id)" class="text-green-600 underline mr-2">Edit</button>
+          <button @click="deleteJob(job.id)" class="text-red-600 underline">Delete</button>
+        </li>
+      </ul>
+      <div v-if="jobsStore.jobs.length === 0" class="text-gray-500">No jobs found.</div>
     </div>
   </div>
 </template>
