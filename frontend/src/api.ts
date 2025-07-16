@@ -30,6 +30,7 @@ api.interceptors.response.use(
         await auth.refreshAccessToken()
         originalRequest.headers.Authorization = `Bearer ${auth.token}`
         return api(originalRequest)  // retry request
+        
       } catch (refreshErr) {
         auth.logout()
         return Promise.reject(refreshErr)

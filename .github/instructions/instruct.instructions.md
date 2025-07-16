@@ -26,6 +26,9 @@ applyTo: '**'
 - Use SimpleJWT for authentication.
 - Some endpoints will be protected in the future.
 - No API versioning for now.
+- use axios.
+- use pinia store, stored at frontend/src/stores/auth.ts
+
 
 ## 4. Error Handling & User Feedback
 - Show errors as toast notifications on the frontend.
