@@ -1,6 +1,7 @@
 # jobs/factories.py
 import factory
 from jobs.models import Job
+from typing import Any
 
 class JobFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -28,7 +29,7 @@ class JobFactory(factory.django.DjangoModelFactory):
         return data
     
     @classmethod
-    def create_job(cls, **kwargs):
+    def create_job(cls, **kwargs: Any):
         """Create and return a Job instance using factory_boy with optional overrides."""
         # Merge defaults with any overrides from kwargs
         data = {
