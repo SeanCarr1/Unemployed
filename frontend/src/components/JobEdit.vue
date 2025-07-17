@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useJobsStore } from '../stores/jobs'
 
 
 const route = useRoute()
-const jobId = Number(route.params.pk)
+const jobId = Number(route.params.id)
 const jobsStore = useJobsStore()
 const router = useRouter()
 
@@ -19,7 +19,9 @@ const job_type = ref<string>('')
 // Fetch all jobs from the API on component mount
 onMounted(() => {
   jobsStore.fetchJob(jobId)
-  const job = jobsStore.selectedJob
+})
+
+watch(() => jobsStore.selectedJob, (job) => {
   if (job) {
     title.value = job.title
     description.value = job.description
@@ -40,7 +42,7 @@ async function updateJob() {
       salary_max: salary_max.value ?? 0,
       job_type: job_type.value
     })
-    router.push('/dashboard/jobs')
+    router.push('/jobs')
   } catch (err) {
     // error is set in store
   }
