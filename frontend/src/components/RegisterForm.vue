@@ -1,17 +1,20 @@
 <script setup lang=ts>
 
 import { ref } from 'vue';
-
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth';
 
 const email = ref<string>('')    
 const password = ref<string>('')
+const re_password = ref<string>('')
 const username = ref<string>('')
 const auth = useAuthStore()
 const role = ref<string>('seeker') // Default to job seeker
+const router = useRouter()
 
 const register = async () => {
-    await auth.register(email.value, username.value, password.value, role.value)
+    await auth.register(email.value, username.value, password.value, re_password.value, role.value)
+    router.push('/login')
 }
 </script>
 
@@ -30,6 +33,10 @@ const register = async () => {
 
             <label>Password</label>
             <input type="password" v-model="password" required>
+            <br>
+
+            <label>Confirm Password</label>
+            <input type="password" v-model="re_password" required>
             <br>
 
             <label>Role</label>
