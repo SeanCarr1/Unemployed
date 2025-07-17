@@ -39,7 +39,7 @@ class LoginFlowTestCase(TestCase):
             password=self.password,
             role=self.role
         )
-        self.login_url = "/api/token/"
+        self.login_url = "/token/"
 
     def test_login_success(self):
         """User can log in with valid email and password and receives tokens."""

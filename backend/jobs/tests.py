@@ -11,9 +11,9 @@ class AuthenticatedAPITestCase(APITestCase):
     """Base test case with authentication helper."""
 
     def authenticate(self, user):
-        """Authenticate as the given user using JWT."""
+        """Authenticate as the given user using JWT (Djoser endpoint)."""
         password = "employerpass" if user.role == "employer" else "seekerpass"
-        response = self.client.post("/api/token/", {"email": user.email, "password": password}, format="json")
+        response = self.client.post("/auth/jwt/create/", {"email": user.email, "password": password}, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         token = response.json()["access"]
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
@@ -26,7 +26,7 @@ class JobCreationTestCase(AuthenticatedAPITestCase):
         user_factory = TestUserFactory()
         self.employer = user_factory.create_user(password="employerpass", email="employer@gmail.com", role="employer")
         self.seeker = user_factory.create_user(password="seekerpass", email="seeker@gmail.com", role="seeker")
-        self.jobs_url = "/api/jobs/"
+        self.jobs_url = "/jobs/"
         self.client = APIClient()
 
 
@@ -69,7 +69,7 @@ class JobRetrieveTestCase(AuthenticatedAPITestCase):
         self.client = APIClient()
         self.employer = user_factory.create_user(email="employer@gmail.com", role="employer")
         self.seeker = user_factory.create_user(email="seeker@gmail.com", role="seeker")
-        self.jobs_url = "/api/jobs/"
+        self.jobs_url = "/jobs/"
         self.job = JobFactory.create_job(employer=self.employer)
 
     def assert_job_response_matches_instance(self, response_data, job):
@@ -113,7 +113,7 @@ class JobUpdateTestCase(AuthenticatedAPITestCase):
         self.employer = user_factory.create_user(password="employerpass", email="employer@gmail.com", role="employer")
         self.other_employer = user_factory.create_user(password="employerpass", email="otheremployer@gmail.com", role="employer")
         self.seeker = user_factory.create_user(password="seekerpass", email="seeker@gmail.com", role="seeker")
-        self.jobs_url = "/api/jobs/"
+        self.jobs_url = "/jobs/"
         self.client = APIClient()
         self.job = JobFactory.create_job(employer=self.employer)
 
@@ -186,7 +186,7 @@ class JobDeleteTestCase(AuthenticatedAPITestCase):
         
         self.seeker = user_factory.create_user(password="seekerpass", email="seeker@gmail.com", role="seeker")
         
-        self.jobs_url = "/api/jobs/"
+        self.jobs_url = "/jobs/"
         self.job = JobFactory.create_job(employer=self.employer)
     
     def test_employer_can_delete_own_job(self):
