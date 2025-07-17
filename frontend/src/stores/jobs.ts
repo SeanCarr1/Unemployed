@@ -15,7 +15,9 @@ export const useJobsStore = defineStore('jobs', {
       this.loading = true
       this.error = null
       try {
-        this.jobs = await listJobs()
+        const response = await listJobs()
+        // If paginated, use response.results; else fallback to response
+        this.jobs = Array.isArray(response) ? response : response.results || []
       } catch (err: any) {
         this.error = err.detail || err.message || 'Failed to fetch jobs'
       } finally {
