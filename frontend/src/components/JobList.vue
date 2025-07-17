@@ -38,7 +38,7 @@ async function deleteJob(id: number) {
     <div v-if="jobsStore.loading">Loading jobs...</div>
     <div v-else>
       <ul>
-        <li v-for="job in jobsStore.jobs" :key="job.id" class="mb-4 border-b pb-2">
+        <li v-for="job in jobsStore.jobs.filter(j => j && j.id)" :key="job.id" class="mb-4 border-b pb-2">
           <div class="font-semibold">{{ job.title }}</div>
           <div>{{ job.location }} | {{ job.job_type }}</div>
           <div>Salary: {{ job.salary_min }} - {{ job.salary_max }}</div>

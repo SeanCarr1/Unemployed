@@ -4,7 +4,7 @@ import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useJobsStore } from '../stores/jobs'
 
-const route = useRoute
+const route = useRoute()
 const jobId = Number(route.params.id)
 const jobsStore = useJobsStore()
 

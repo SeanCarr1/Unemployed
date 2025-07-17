@@ -24,7 +24,7 @@ async function createJob() {
       salary_max: salary_max.value ?? 0,
       job_type: job_type.value
     })
-    router.push('/dashboard/jobs')
+    router.push('/jobs')
   } catch (err) {
     // error is set in store
   }
