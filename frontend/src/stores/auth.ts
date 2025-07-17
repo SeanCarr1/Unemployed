@@ -17,23 +17,20 @@ export const useAuthStore = defineStore('auth', () => {
     const isAuthenticated = computed(() => !!user.value)
 
     const fetchUser = async () => {
-        if (!token.value){
-            return  
-        } 
+        if (!token.value) return;
         try {
-            const res = await api.get<User>('/example/', {
-                headers: { Authorization: `Bearer ${token.value}`, }
-            })
-            user.value = res.data
-            
+            // Use Djoser's endpoint for current user info
+            const res = await api.get<User>('/auth/users/me/');
+            user.value = res.data;
         } catch (err) {
-            logout()
+            error.value = 'Failed to fetch user';
+            logout();
         }
     }
 
-    const register = async(email: string, username: string, password: string, role: string) => {
+    const register = async(email: string, username: string, password: string, re_password: string, role: string) => {
         try {
-            await api.post<{ access: string, refresh: string }>('/auth/users/', { email, username, password, role })
+            await api.post<{ access: string, refresh: string }>('/auth/users/', { email, username, password, re_password, role })
         } catch(err: any) {
             error.value = 'Invalid registration'
         }
