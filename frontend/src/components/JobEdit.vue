@@ -1,53 +1,82 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import api from '../api'
+import { useRouter, useRoute } from 'vue-router'
+import { useJobsStore } from '../stores/jobs'
+
 
 const route = useRoute()
+const jobId = Number(route.params.pk)
+const jobsStore = useJobsStore()
 const router = useRouter()
-const jobId = route.params.id
 
-const title = ref('')
-const description = ref('')
-const error = ref('')
-const loading = ref(true)
+const title = ref<string>('')
+const description = ref<string>('') 
+const location = ref<string>('') 
+const salary_min = ref<number | null>(null)
+const salary_max = ref<number | null>(null)
+const job_type = ref<string>('') 
 
-const fetchJob = async () => {
-  try {
-    const res = await api.get(`/jobs/${jobId}/`)
-    title.value = res.data.title
-    description.value = res.data.description
-  } catch (err) {
-    error.value = 'Failed to load job.'
-  } finally {
-    loading.value = false
+// Fetch all jobs from the API on component mount
+onMounted(() => {
+  jobsStore.fetchJob(jobId)
+  const job = jobsStore.selectedJob
+  if (job) {
+    title.value = job.title
+    description.value = job.description
+    location.value = job.location
+    salary_min.value = Number(job.salary_min)
+    salary_max.value = Number(job.salary_max)
+    job_type.value = job.job_type
   }
-}
+})
 
-const update = async () => {
+async function updateJob() {
   try {
-    await api.patch(`/jobs/${jobId}/`, {
+    await jobsStore.updateJob(jobId, {
       title: title.value,
-      description: description.value
+      description: description.value,
+      location: location.value,
+      salary_min: salary_min.value ?? 0,
+      salary_max: salary_max.value ?? 0,
+      job_type: job_type.value
     })
-    await router.push('/dashboard/jobs')
+    router.push('/dashboard/jobs')
   } catch (err) {
-    error.value = 'Update failed.'
+    // error is set in store
   }
 }
 
-onMounted(fetchJob)
 </script>
 
 <template>
   <div>
     <h2>Edit Job</h2>
-    <div v-if="loading">Loading...</div>
-    <form v-else @submit.prevent="update">
+    <div v-if="jobsStore.error" class="text-red-500">{{ jobsStore.error }}</div>
+    <div v-if="jobsStore.loading">Loading job...</div>
+    <form v-else @submit.prevent="updateJob">
+      <label>Title:</label>
       <input v-model="title" type="text" required /><br />
+
+      <label>Description:</label>
       <textarea v-model="description" required></textarea><br />
+
+      <label>Location:</label>
+      <input v-model="location" type="text" required /><br />
+
+      <label>Salary Min:</label>
+      <input v-model.number="salary_min" type="number" required /><br />
+
+      <label>Salary Max:</label>
+      <input v-model.number="salary_max" type="number" required /><br />
+
+      <label>Job Type:</label>
+      <select v-model="job_type" required>
+        <option value="full-time">Full-time</option>
+        <option value="part-time">Part-time</option>
+        <option value="contractual">Contractual</option>
+      </select><br />
+      
       <button type="submit">Update</button>
     </form>
-    <p style="color: red">{{ error }}</p>
   </div>
 </template>

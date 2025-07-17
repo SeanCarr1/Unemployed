@@ -55,16 +55,20 @@ export const useJobsStore = defineStore('jobs', {
     async updateJob(id: number, payload: Partial<JobPayload>) {
       this.loading = true
       this.error = null
+
       try {
         const job = await updateJob(id, payload)
         // Update job in jobs array
         const idx = this.jobs.findIndex(j => j.id === id)
+
         if (idx !== -1) this.jobs[idx] = job
         if (this.selectedJob?.id === id) this.selectedJob = job
         return job
+
       } catch (err: any) {
         this.error = err.detail || err.message || 'Failed to update job'
         throw err
+
       } finally {
         this.loading = false
       }
@@ -77,9 +81,11 @@ export const useJobsStore = defineStore('jobs', {
         await deleteJob(id)
         this.jobs = this.jobs.filter(j => j.id !== id)
         if (this.selectedJob?.id === id) this.selectedJob = null
+        
       } catch (err: any) {
         this.error = err.detail || err.message || 'Failed to delete job'
         throw err
+
       } finally {
         this.loading = false
       }
