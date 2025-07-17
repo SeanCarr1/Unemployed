@@ -11,23 +11,31 @@ import JobForm from '@/components/JobForm.vue'
 import JobList from '@/components/JobList.vue'
 import JobEdit from '@/components/JobEdit.vue'
 import RegisterForm from '@/components/RegisterForm.vue'
+import JobDetail from '@/components/JobDetail.vue'
+
 
 
 
 const routes = [
-    { path: '/', redirect: '/dashboard'},
+    { path: '/', redirect: '/jobs' },
     { path: '/register', component: RegisterForm, meta: { public: true } },
     { path: '/login', component: LoginForm, meta: { public: true } },
-    { 
-        path: '/dashboard', 
+    {
+        path: '/dashboard',
         component: Dashboard,
+        meta: { requiresAuth: true }
+    },
+    {
+        path: '/jobs',
+        component: () => import('@/components/Jobs.vue'),
+        meta: { requiresAuth: true },
         children: [
             { path: '', component: JobList },
-            { path: 'jobs', component: JobList },
-            { path: 'jobs/new', component: JobForm },
-            { path: 'jobs/:id/edit', component: JobEdit },
-        ],
-        meta: { requiresAuth: true }
+            { path: 'new', component: JobForm },
+            { path: ':id/edit', component: JobEdit },
+            { path: ':id', component: JobDetail },
+            
+        ]
     },
 ]
 
@@ -40,7 +48,7 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
     const auth = useAuthStore()
 
-    if (!auth.use && auth.token) {
+    if (!auth.user && auth.token) {
         await auth.fetchUser()
     }
 
