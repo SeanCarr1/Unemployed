@@ -14,8 +14,8 @@ router.register(r'applications', ApplicationViewSet, basename='application')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('users.urls')),
-    path('api/', include(router.urls)),
+    path('', include('users.urls')),
+    path('', include(router.urls)),
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
 ]
