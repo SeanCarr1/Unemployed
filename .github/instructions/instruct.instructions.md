@@ -72,6 +72,7 @@ applyTo: '**'
 - do not make any changes until you have 95% confidence that you know what to build. ask me follow up questions until you have that confidence.
 - after every major change remind me to push to git.
 - if you think there is a much more optimal solution, do recommend it to me so i can assess my options.
+- if the prompt is an error, give a detailed explanation on what the error is, why did it happen, give locations on where to start looking for solutions, and of course the high-level solution.
 ---
 
 ## 13. Testing & TDD
