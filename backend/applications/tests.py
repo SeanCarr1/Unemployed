@@ -5,6 +5,7 @@ from django.urls import reverse
 # Import factories for users, jobs, and applications
 from users.factories import TestUserFactory
 from jobs.factories import JobFactory
+from .factories import ApplicationFactory
 # from .factories import ApplicationFactory  # To be implemented
 
 # Base test case with authentication helper (copied from jobs/tests.py)
@@ -34,9 +35,8 @@ class ApplicationCreationTestCase(AuthenticatedAPITestCase):
 
     def test_seeker_can_apply_to_job(self):
         """Seeker can create an application for a job."""
-        # TODO: Use ApplicationFactory.build_api_payload()
         self.authenticate(self.seeker)
-        data = {"job": self.job.pk}
+        data = ApplicationFactory.build_api_payload(job=self.job, seeker=self.seeker)
         response = self.client.post(self.applications_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn("id", response.json())
@@ -44,14 +44,14 @@ class ApplicationCreationTestCase(AuthenticatedAPITestCase):
     def test_employer_cannot_apply_to_job(self):
         """Employer cannot create an application (should be forbidden)."""
         self.authenticate(self.employer)
-        data = {"job": self.job.pk}
+        data = ApplicationFactory.build_api_payload(job=self.job, seeker=self.employer)
         response = self.client.post(self.applications_url, data, format="json")
         self.assertIn(response.status_code, [status.HTTP_403_FORBIDDEN, status.HTTP_401_UNAUTHORIZED])
 
     def test_duplicate_application(self):
         """Seeker cannot apply to the same job twice."""
         self.authenticate(self.seeker)
-        data = {"job": self.job.pk}
+        data = ApplicationFactory.build_api_payload(job=self.job, seeker=self.seeker)
         # First application
         self.client.post(self.applications_url, data, format="json")
         # Duplicate application
@@ -61,7 +61,7 @@ class ApplicationCreationTestCase(AuthenticatedAPITestCase):
     def test_invalid_application_data(self):
         """Application creation with invalid data returns 400."""
         self.authenticate(self.seeker)
-        data = {"job": None}  # Invalid job
+        data = ApplicationFactory.build_api_payload(job=None, seeker=self.seeker)
         response = self.client.post(self.applications_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -77,7 +77,9 @@ class ApplicationListTestCase(AuthenticatedAPITestCase):
         self.job = JobFactory.create_job(employer=self.employer)
         self.applications_url = "/applications/"
         self.client = APIClient()
-        # TODO: Create applications using ApplicationFactory
+        # Create applications using ApplicationFactory
+        self.application1 = ApplicationFactory.create_application(job=self.job, seeker=self.seeker)
+        self.application2 = ApplicationFactory.create_application(job=self.job, seeker=self.seeker)
 
     def test_seeker_can_list_own_applications(self):
         """Seeker can list their own applications."""
@@ -103,8 +105,8 @@ class ApplicationRetrieveTestCase(AuthenticatedAPITestCase):
         self.employer = user_factory.create_user(password="employerpass", email="employer@gmail.com", role="employer")
         self.job = JobFactory.create_job(employer=self.employer)
         self.client = APIClient()
-        # TODO: Create application using ApplicationFactory
-        self.application_id = 1  # Placeholder
+        self.application = ApplicationFactory.create_application(job=self.job, seeker=self.seeker)
+        self.application_id = self.application.pk
 
     def test_seeker_can_retrieve_own_application(self):
         """Seeker can retrieve their own application."""
@@ -138,8 +140,8 @@ class ApplicationUpdateTestCase(AuthenticatedAPITestCase):
         self.employer = user_factory.create_user(password="employerpass", email="employer@gmail.com", role="employer")
         self.job = JobFactory.create_job(employer=self.employer)
         self.client = APIClient()
-        # TODO: Create application using ApplicationFactory
-        self.application_id = 1  # Placeholder
+        self.application = ApplicationFactory.create_application(job=self.job, seeker=self.seeker)
+        self.application_id = self.application.pk
 
     def test_employer_can_update_application_status(self):
         """Employer can update application status (e.g., accept/reject)."""
@@ -176,8 +178,8 @@ class ApplicationDeleteTestCase(AuthenticatedAPITestCase):
         self.employer = user_factory.create_user(password="employerpass", email="employer@gmail.com", role="employer")
         self.job = JobFactory.create_job(employer=self.employer)
         self.client = APIClient()
-        # TODO: Create application using ApplicationFactory
-        self.application_id = 1  # Placeholder
+        self.application = ApplicationFactory.create_application(job=self.job, seeker=self.seeker)
+        self.application_id = self.application.pk
 
     def test_seeker_can_withdraw_own_application(self):
         """Seeker can delete (withdraw) their own application."""
