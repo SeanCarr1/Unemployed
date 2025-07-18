@@ -7,10 +7,5 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Application
-        fields = [
-            'id', 'job', 'job_title',
-            'seeker', 'seeker_email',
-            'resume', 'cover_letter',
-            'status', 'applied_at'
-        ]
+        fields = ['__all__']
         read_only_fields = ['status', 'applied_at']
