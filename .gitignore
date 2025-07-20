@@ -26,3 +26,6 @@ dist/
 # System files
 Thumbs.db
 .DS_Store
+
+# Copilot
+.github/
