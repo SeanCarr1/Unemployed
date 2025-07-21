@@ -69,16 +69,6 @@ docker-compose.yml
 README.md
 ```
 
-## Coding Standards
-- OOP, type annotations, dependency injection (where possible)
-- Business logic separated from views (service layer)
-- Use Django migrations for model changes
-- RESTful API, kebab-case endpoints
-- JSON error responses for user-facing errors
-- Automated tests for features, not every function
-- Use factories for test data
-- All secrets from environment variables
-- Feature branches, clear commit messages
 
 ## User Roles
 - Job Seekers: apply to jobs
