@@ -20,39 +20,7 @@ A Django + Vue fullstack web application for job seekers and employers.
 - Testing: Django TestCase, DRF APIClient, Vitest/Jest
 - Factories: factory_boy for test data
 
-## Local Development
 
-### Prerequisites
-- Docker & Docker Compose
-- Node.js & npm (for frontend)
-
-### Quickstart
-1. Clone the repo
-2. Copy `.env.example` to `.env` and set secrets
-3. Build and start services:
-   ```sh
-   docker-compose up --build
-   ```
-4. Run backend migrations:
-   ```sh
-   docker-compose exec backend python manage.py migrate
-   ```
-5. (Optional) Create a superuser:
-   ```sh
-   docker-compose exec backend python manage.py createsuperuser
-   ```
-6. Access frontend at `http://localhost:5173` and backend API at `http://localhost:8000`
-
-## Running Tests
-- Backend:
-  ```sh
-  docker-compose exec backend python manage.py test
-  ```
-- Frontend:
-  ```sh
-  cd frontend
-  npm run test
-  ```
 
 ## Project Structure
 ```
