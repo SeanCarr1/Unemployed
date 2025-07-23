@@ -31,7 +31,7 @@ applyTo: '**'
 
 
 ## 4. Error Handling & User Feedback
-- Show errors as toast notifications on the frontend.
+<!-- - Show errors as toast notifications on the frontend. -->
 - Backend should return JSON error responses for user-facing errors.
 
 ## 5. Testing
@@ -79,7 +79,7 @@ applyTo: '**'
 - Automated tests should be used for backend and frontend features.
 - Prefer test-driven development (TDD): write tests for expected inputs/outputs before implementing features.
 - For backend, use Django’s built-in testing framework.
-- For frontend, use Vitest or Jest for unit/integration tests.
+- For frontend, use Vitest for unit/integration tests.
 - Tests should focus on feature coverage, not every function.
 - Use API tools (Postman, curl) or temporary frontend helpers for rapid manual testing, but prioritize automated tests for reliability.
 - prefer writing tests that are focused on sending data through the api endpoints (POST requests), especially for CRUD operations since we implemented a frontend. Basically think of the test as coming from the front end but don't be confused. the tests are still written in the backend using the DRF testing.
