@@ -1,6 +1,6 @@
 
 import { mount } from '@vue/test-utils'
-import JobForm from '@/components/JobForm.vue'
+import JobForm from '@/components/jobs/JobForm.vue'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useJobsStore } from '@/stores/jobs'
 import { setActivePinia, createPinia } from 'pinia'

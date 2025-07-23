@@ -1,6 +1,6 @@
 
 import { mount } from '@vue/test-utils'
-import JobEdit from '@/components/JobEdit.vue'
+import JobEdit from '@/components/jobs/JobEdit.vue'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useJobsStore } from '@/stores/jobs'
 import { setActivePinia, createPinia } from 'pinia'
