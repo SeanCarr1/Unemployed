@@ -2,7 +2,7 @@
 // Service for job CRUD operations using axios and Pinia auth store
 // All errors are thrown for toast notifications
 
-import api from './api'
+import api from '@/api/api'
 
 export interface Job {
   id: number
