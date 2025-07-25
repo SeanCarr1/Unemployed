@@ -1,6 +1,6 @@
 
 import { mount } from '@vue/test-utils'
-import JobForm from '@/components/JobForm.vue'
+import JobForm from '@/components/jobs/JobForm.vue'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useJobsStore } from '@/stores/jobs'
 import { setActivePinia, createPinia } from 'pinia'
@@ -29,9 +29,9 @@ describe('JobForm.vue', () => {
     expect(wrapper.text()).toContain('Loading')
   })
 
-  it('calls createJob on submit', async () => {
+  it('calls create on submit', async () => {
     const store = useJobsStore()
-    const spy = vi.spyOn(store, 'createJob').mockResolvedValue({})
+    const spy = vi.spyOn(store, 'create').mockResolvedValue({})
     const wrapper = mount(JobForm)
     await wrapper.find('form').trigger('submit.prevent')
     expect(spy).toHaveBeenCalled()

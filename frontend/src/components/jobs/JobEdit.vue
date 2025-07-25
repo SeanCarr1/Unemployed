@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useJobsStore } from '../stores/jobs'
+import { ref, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useJobsStore } from '../../stores/jobs'
 
 
+const route = useRoute()
+const jobId = Number(route.params.id)
 const jobsStore = useJobsStore()
 const router = useRouter()
 
@@ -14,9 +16,25 @@ const salary_min = ref<number | null>(null)
 const salary_max = ref<number | null>(null)
 const job_type = ref<string>('') 
 
-async function createJob() {
+// Fetch all jobs from the API on component mount
+onMounted(() => {
+  jobsStore.fetchOne(jobId)
+})
+
+watch(() => jobsStore.selected, (job) => {
+  if (job) {
+    title.value = job.title
+    description.value = job.description
+    location.value = job.location
+    salary_min.value = Number(job.salary_min)
+    salary_max.value = Number(job.salary_max)
+    job_type.value = job.job_type
+  }
+})
+
+async function updateJob() {
   try {
-    await jobsStore.createJob({
+    await jobsStore.update(jobId, {
       title: title.value,
       description: description.value,
       location: location.value,
@@ -29,14 +47,15 @@ async function createJob() {
     // error is set in store
   }
 }
+
 </script>
 
 <template>
   <div>
-    <h2>Create Job</h2>
+    <h2>Edit Job</h2>
     <div v-if="jobsStore.error" class="text-red-500">{{ jobsStore.error }}</div>
     <div v-if="jobsStore.loading">Loading job...</div>
-    <form v-else @submit.prevent="createJob">
+    <form v-else @submit.prevent="updateJob">
       <label>Title:</label>
       <input v-model="title" type="text" required /><br />
 
@@ -59,8 +78,7 @@ async function createJob() {
         <option value="contractual">Contractual</option>
       </select><br />
       
-      <button type="submit">Create Job</button>
+      <button type="submit">Update</button>
     </form>
   </div>
 </template>
-
