@@ -38,9 +38,9 @@ describe('JobEdit.vue', () => {
     expect(wrapper.text()).toContain('Loading')
   })
 
-  it('calls updateJob on submit', async () => {
+  it('calls update on submit', async () => {
     const store = useJobsStore()
-    // Mock a valid Job object for updateJob
+    // Mock a valid Job object for update
     const mockJob = {
       id: 1,
       title: 'Test Job',
@@ -52,7 +52,7 @@ describe('JobEdit.vue', () => {
       employer_email: 'employer@example.com',
       posted_at: '2025-07-18T00:00:00Z',
     };
-    const spy = vi.spyOn(store, 'updateJob').mockResolvedValue(mockJob)
+    const spy = vi.spyOn(store, 'update').mockResolvedValue(mockJob)
     const wrapper = mount(JobEdit)
     await wrapper.find('form').trigger('submit.prevent')
     expect(spy).toHaveBeenCalled()
