@@ -29,3 +29,11 @@ Thumbs.db
 
 # github
 .github/
+
+#venv
+venv
+
+#vs code
+.idea
+todo.txt
+*.code-workspace
