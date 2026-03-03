@@ -1,18 +1,17 @@
-# Base image with Node.js
-FROM node:20
+FROM oven/bun:latest
 
-# set working directory inside container
 WORKDIR /app
 
-# copy package.json and lock file first for caching
-COPY package*.json ./
 
-# install dependencies
-RUN npm install
-# copy the rest of your vue project
+# Only copy package manifests first for dependency caching
+
+# Only copy package manifests first for dependency caching
+COPY package.json bun.lockb ./
+RUN bun install
+
+# Copy the rest of the source code (excluding node_modules)
 COPY . .
 
 EXPOSE 5173
 
-# Run vite dev server
-CMD ["npm", "run", "dev"]
+CMD ["bun", "run", "dev"]
