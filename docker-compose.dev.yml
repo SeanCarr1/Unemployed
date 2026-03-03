@@ -1,0 +1,35 @@
+services:
+  db-dev:
+    image: postgres:18-alpine
+    container_name: unemployed_db_dev
+    environment:
+      POSTGRES_DB: unemployed_dev
+      POSTGRES_USER: unemployed_dev_user
+      POSTGRES_PASSWORD: unemployed_dev_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_dev_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: dev_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: seancarr2005@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8002:80"
+    depends_on:
+      - db-dev
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+  backend:
+    environment:
+      - DATABASE_URL=postgres://unemployed_dev_user:unemployed_dev_pass@db-dev:5432/unemployed_dev
+    depends_on:
+      - db-dev
+
+volumes:
+  db_dev_data:
+  pgadmin_data:
