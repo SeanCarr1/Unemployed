@@ -7,11 +7,11 @@ const Dashboard = () => import('../components/Dashboard.vue') // loads the dashb
 
 // Views
 import LoginForm from '../components/LoginForm.vue'
-import JobForm from '@/components/JobForm.vue'
-import JobList from '@/components/JobList.vue'
-import JobEdit from '@/components/JobEdit.vue'
+import JobForm from '@/components/jobs/JobForm.vue'
+import JobList from '@/components/jobs/JobList.vue'
+import JobEdit from '@/components/jobs/JobEdit.vue'
 import RegisterForm from '@/components/RegisterForm.vue'
-import JobDetail from '@/components/JobDetail.vue'
+import JobDetail from '@/components/jobs/JobDetail.vue'
 
 
 
@@ -27,7 +27,7 @@ const routes = [
     },
     {
         path: '/jobs',
-        component: () => import('@/components/Jobs.vue'),
+        component: () => import('@/components/jobs/Jobs.vue'),
         meta: { requiresAuth: true },
         children: [
             { path: '', component: JobList },

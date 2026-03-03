@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia' //used to create global state store
 import { ref, computed } from 'vue' //vue's reactivity system for state and derived values
-import api from '../api.ts'
+import api from '../api/api.ts'
 
 interface User {
   username: string
