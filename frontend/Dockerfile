@@ -1,17 +1,35 @@
-FROM oven/bun:latest
+# --- Bun multi-stage build for Vite frontend ---
 
-WORKDIR /app
+FROM oven/bun:1 AS base
+WORKDIR /usr/src/app
 
+# Install dev dependencies (for development and build)
+FROM base AS install
+RUN mkdir -p /temp/dev
+COPY package.json bun.lock /temp/dev/
+RUN cd /temp/dev && bun install --frozen-lockfile
 
-# Only copy package manifests first for dependency caching
+# Install production dependencies only (for final image)
+FROM base AS prodinstall
+RUN mkdir -p /temp/prod
+COPY package.json bun.lock /temp/prod/
+RUN cd /temp/prod && bun install --frozen-lockfile --production
 
-# Only copy package manifests first for dependency caching
-COPY package.json bun.lockb ./
-RUN bun install
-
-# Copy the rest of the source code (excluding node_modules)
+# Copy node_modules and source for build/test
+FROM base AS prerelease
+COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
 
-EXPOSE 5173
+# [optional] run tests & build
+# ENV NODE_ENV=production
+# RUN bun test
+# RUN bun run build
 
-CMD ["bun", "run", "dev"]
+# Final image: only production deps and source
+FROM base AS release
+WORKDIR /usr/src/app
+COPY --from=prodinstall /temp/prod/node_modules node_modules
+COPY --from=prerelease /usr/src/app/ .
+
+EXPOSE 5173
+CMD ["bun", "x", "vite", "--host", "0.0.0.0"]
