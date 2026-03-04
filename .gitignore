@@ -9,7 +9,7 @@ db.sqlite3
 
 # Django
 media/
-.idea
+.idea/
 staticfiles/
 
 # Node/Vue
