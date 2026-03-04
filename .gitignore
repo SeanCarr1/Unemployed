@@ -23,6 +23,7 @@ dist/
 
 # VS Code
 .vscode/
+*.code-workspace
 
 # System files
 Thumbs.db
