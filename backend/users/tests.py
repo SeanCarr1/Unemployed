@@ -22,7 +22,38 @@ class RegistrationTestCase(TestCase):
         self.assertEqual(user.username, "testuser")
         self.assertEqual(user.role, "seeker")
 
-# --- LOGIN FLOW TESTS ---
+
+# --- ADMIN DASHBOARD TESTS ---
+from rest_framework.test import APIClient
+
+class AdminUserListTestCase(TestCase):
+    """Tests that only admin can list all users via /users/ endpoint."""
+    def setUp(self):
+        self.admin = CustomUser.objects.create_superuser(
+            email="admin@example.com",
+            username="admin",
+            password="adminpass",
+            role="employer"
+        )
+        self.user = CustomUser.objects.create_user(
+            email="user@example.com",
+            username="user",
+            password="userpass",
+            role="seeker"
+        )
+        self.client = APIClient()
+        self.list_url = "/users/"
+
+    def test_admin_can_list_users(self):
+        self.client.force_authenticate(user=self.admin)
+        response = self.client.get(self.list_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(any(u["email"] == "user@example.com" for u in response.json()["results"]))
+
+    def test_non_admin_cannot_list_users(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self.list_url)
+        self.assertEqual(response.status_code, 403)
 
 class LoginFlowTestCase(TestCase):
     """Tests login flow for CustomUser using SimpleJWT."""
