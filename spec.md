@@ -1,9 +1,11 @@
 # Unemployed Project — Feature Spec & Planning
 
 ## 1. Admin Features
-- **Admin Dashboard**
-	- Backend: Create admin-only endpoints for user/company management (`users/views.py`, `users/serializers.py`, future `companies/`).
-	- Frontend: Build dashboard UI for admins (`frontend/src/views/AdminDashboard.vue`).
+**Admin Dashboard**
+	- Backend: Create admin-only endpoints for user management (`users/views.py`, `users/serializers.py`).
+	- Backend: Create admin-only endpoints for company management (`companies/views.py`, `companies/serializers.py`).
+	- Frontend: Build dashboard UI for admins (`frontend/src/views/AdminDashboard.vue`) to display and manage users and companies.
+	- Admin actions: promote/demote/deactivate users, manage companies (CRUD).
 - **Company CRUD**
 	- Backend: Add Company model, endpoints for create/read/update/delete (`companies/models.py`, `companies/views.py`).
 	- Frontend: Company management UI for admins/employers (`frontend/src/components/CompanyForm.vue`).
