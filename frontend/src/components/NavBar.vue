@@ -37,3 +37,13 @@ a.router-link-active {
 	color: #007bff;
 }
 </style>
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  background: #f8f9fa;
+  padding: 1rem;
+}
