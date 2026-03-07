@@ -3,21 +3,23 @@ import { useAuthStore } from '@/stores/auth'
 
 
 // Lazy-loaded (optional)
-const Dashboard = () => import('../components/Dashboard.vue') // loads the dashboard component only when needed
+const Dashboard = () => import('@/components/Dashboard.vue') // loads the dashboard component only when needed
 
 // Views
-import LoginForm from '../components/LoginForm.vue'
+
+import Home from '@/views/Home.vue'
+import LoginForm from '@/components/users/LoginForm.vue'
 import JobForm from '@/components/jobs/JobForm.vue'
 import JobList from '@/components/jobs/JobList.vue'
 import JobEdit from '@/components/jobs/JobEdit.vue'
-import RegisterForm from '@/components/RegisterForm.vue'
+import RegisterForm from '@/components/users/RegisterForm.vue'
 import JobDetail from '@/components/jobs/JobDetail.vue'
 
 
 
 
 const routes = [
-    { path: '/', redirect: '/jobs' },
+    { path: '/', component: Home, meta: { public: true } },
     { path: '/register', component: RegisterForm, meta: { public: true } },
     { path: '/login', component: LoginForm, meta: { public: true } },
     {
@@ -34,7 +36,6 @@ const routes = [
             { path: 'new', component: JobForm },
             { path: ':id/edit', component: JobEdit },
             { path: ':id', component: JobDetail },
-            
         ]
     },
 ]
