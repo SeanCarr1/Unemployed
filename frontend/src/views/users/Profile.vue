@@ -38,13 +38,19 @@
 
         <section v-if="authStore.isSeeker" class="space-y-4">
           <h3 class="text-lg font-bold">Your Applications</h3>
-          <div v-if="applications.length === 0" class="rounded-2xl border border-dashed border-neutral-200 p-8 text-center">
+          <div v-if="applicationsLoading" class="rounded-2xl border border-dashed border-neutral-200 p-8 text-center">
+            <p class="text-neutral-500">Loading your applications...</p>
+          </div>
+          <div v-else-if="applicationsError" class="rounded-2xl border border-dashed border-red-200 bg-red-50 p-8 text-center">
+            <p class="text-red-700">{{ applicationsError }}</p>
+          </div>
+          <div v-else-if="applications.length === 0" class="rounded-2xl border border-dashed border-neutral-200 p-8 text-center">
             <p class="text-neutral-500">You haven't applied to any jobs yet.</p>
           </div>
           <div v-for="app in applications" :key="app.id" class="flex items-center justify-between rounded-2xl border border-neutral-200 bg-white p-6">
             <div>
               <h4 class="font-bold">{{ app.job_title }}</h4>
-              <p class="text-sm text-neutral-500">{{ app.company_name }} • Applied on {{ app.date }}</p>
+              <p class="text-sm text-neutral-500">Applied on {{ formatDate(app.applied_at) }}</p>
             </div>
             <span :class="['rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider', statusColor(app.status)]">
               {{ app.status }}
@@ -57,16 +63,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { computed, reactive, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useApplicationsStore } from '@/stores/applications'
 import { useToastStore } from '@/stores/toast'
 import api from '@/api/api'
 
 const authStore = useAuthStore()
+const applicationsStore = useApplicationsStore()
 const toastStore = useToastStore()
 
 const updating = ref(false)
-const applications = ref<any[]>([])
+
+const applications = computed(() => applicationsStore.items)
+const applicationsLoading = computed(() => applicationsStore.loading)
+const applicationsError = computed(() => applicationsStore.error)
+
 const form = reactive({
   username: authStore.user?.username || '',
   email: authStore.user?.email || ''
@@ -75,13 +87,9 @@ const form = reactive({
 const fetchData = async () => {
   if (authStore.isSeeker) {
     try {
-      const response = await api.get('/applications/my_applications/')
-      applications.value = response.data
+      await applicationsStore.fetchAll()
     } catch (error) {
-      // Mock
-      applications.value = [
-        { id: 1, job_title: 'Senior Product Designer', company_name: 'DesignCo', date: '2024-03-01', status: 'submitted' }
-      ]
+      toastStore.error('Failed to load your applications')
     }
   }
 }
@@ -101,13 +109,24 @@ const handleUpdate = async () => {
 
 const statusColor = (status: string) => {
   switch (status) {
-    case 'submitted': return 'bg-blue-50 text-blue-700'
-    case 'reviewed': return 'bg-yellow-50 text-yellow-700'
+    case 'pending': return 'bg-blue-50 text-blue-700'
     case 'accepted': return 'bg-emerald-50 text-emerald-700'
-    case 'rejected': return 'bg-red-50 text-red-700'
     default: return 'bg-neutral-50 text-neutral-700'
   }
 }
+
+const formatDate = (value: string) => {
+  return new Date(value).toLocaleDateString()
+}
+
+watch(
+  () => authStore.user,
+  (user) => {
+    form.username = user?.username || ''
+    form.email = user?.email || ''
+  },
+  { immediate: true }
+)
 
 onMounted(fetchData)
 </script>
