@@ -1,67 +1,93 @@
-import { createRouter, createWebHistory } from 'vue-router' // used to setup routing in a vue js app
+import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
-
-// Lazy-loaded (optional)
-const Dashboard = () => import('@/components/Dashboard.vue') // loads the dashboard component only when needed
-
-// Views
-
-import Home from '@/views/Home.vue'
-import LoginForm from '@/components/users/LoginForm.vue'
-import JobForm from '@/components/jobs/JobForm.vue'
-import JobList from '@/components/jobs/JobList.vue'
-import JobEdit from '@/components/jobs/JobEdit.vue'
-import RegisterForm from '@/components/users/RegisterForm.vue'
-import JobDetail from '@/components/jobs/JobDetail.vue'
-
-
-
-
-const routes = [
-    { path: '/', component: Home, meta: { public: true } },
-    { path: '/register', component: RegisterForm, meta: { public: true } },
-    { path: '/login', component: LoginForm, meta: { public: true } },
-    {
-        path: '/dashboard',
-        component: Dashboard,
-        meta: { requiresAuth: true }
-    },
-    {
-        path: '/jobs',
-        component: () => import('@/components/jobs/Jobs.vue'),
-        meta: { requiresAuth: true },
-        children: [
-            { path: '', component: JobList },
-            { path: 'new', component: JobForm },
-            { path: ':id/edit', component: JobEdit },
-            { path: ':id', component: JobDetail },
-        ]
-    },
-]
+const JobList = () => import('@/views/jobs/JobList.vue')
+const JobDetail = () => import('@/views/jobs/JobDetail.vue')
+const JobCreate = () => import('@/views/jobs/JobCreate.vue')
+const JobEdit = () => import('@/views/jobs/JobEdit.vue')
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes
+  history: createWebHistory(),
+  routes: [
+    {
+      path: '/',
+      name: 'Home',
+      component: () => import('@/views/home/Home.vue'),
+    },
+    {
+      path: '/jobs',
+      name: 'JobsList',
+      component: JobList,
+    },
+    {
+      path: '/jobs/new',
+      name: 'JobCreate',
+      component: JobCreate,
+      meta: { requiresAuth: true, role: 'employer' },
+    },
+    {
+      path: '/jobs/:id/edit',
+      name: 'JobEdit',
+      component: JobEdit,
+      meta: { requiresAuth: true, role: 'employer' },
+    },
+    {
+      path: '/jobs/:id',
+      name: 'JobDetail',
+      component: JobDetail,
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: () => import('@/views/users/Login.vue'),
+      meta: { guestOnly: true },
+    },
+    {
+      path: '/register',
+      name: 'Register',
+      component: () => import('@/views/users/Register.vue'),
+      meta: { guestOnly: true },
+    },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: () => import('@/views/users/Profile.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/employer/dashboard',
+      name: 'EmployerDashboard',
+      component: () => import('@/views/employer/EmployerDashboard.vue'),
+      meta: { requiresAuth: true, role: 'employer' },
+    },
+  ],
 })
 
-// global route guard
 router.beforeEach(async (to, from, next) => {
-    const auth = useAuthStore()
+  const authStore = useAuthStore()
 
-    if (!auth.user && auth.token) {
-        await auth.fetchUser()
+  // Fetch user profile if token exists but user not loaded
+  if (!authStore.user && authStore.accessToken) {
+    try {
+      await authStore.fetchUser()
+    } catch (e) {
+      authStore.logout()
     }
+  }
 
-    const isAuthenticated = auth.isAuthenticated
+  const isAuthenticated = authStore.isAuthenticated
 
-    if (to.meta.requiresAuth && !isAuthenticated) {
-        next('/login')
-    } else if (to.path == '/login' && isAuthenticated) {
-        next('/dashboard')
-    } else {
-        next()
-    }
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    next('/login')
+  } else if (to.path === '/login' && isAuthenticated) {
+    next('/employer/dashboard')
+  } else if (to.meta.guestOnly && isAuthenticated) {
+    next('/')
+  } else if (to.meta.role && authStore.user?.role !== to.meta.role) {
+    next('/')
+  } else {
+    next()
+  }
 })
 
 export default router
