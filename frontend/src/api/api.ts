@@ -3,43 +3,44 @@ import { useAuthStore } from '@/stores/auth'
 import router from '@/router'
 
 const api = axios.create({
-    baseURL: 'http://localhost:8000/api',
-    headers: {
-        'Content-Type': 'application/json'
-    }
+  baseURL: 'http://localhost:8000/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
 })
 
-
-// Auto-add Authorization header
 api.interceptors.request.use((config) => {
-    const auth = useAuthStore()
-    if (auth.token) {
-        config.headers.Authorization = `Bearer ${auth.token}`
-    }
-    return config
+  const authStore = useAuthStore()
+  if (authStore.accessToken) {
+    config.headers.Authorization = `Bearer ${authStore.accessToken}`
+  }
+  return config
 })
 
-// Intercept 401 errors and try refresh
 api.interceptors.response.use(
-  res => res,
-  async err => {
-    const originalRequest = err.config
-    const auth = useAuthStore()
+  (response) => response,
+  async (error) => {
+    const authStore = useAuthStore()
+    const originalRequest = error.config
 
-    if (err.response?.status === 401 && auth.refreshToken) {
+    if (
+      error.response?.status === 401 &&
+      authStore.refreshToken &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true
       try {
-        await auth.refreshAccessToken()
-        originalRequest.headers.Authorization = `Bearer ${auth.token}`
-        return api(originalRequest)  // retry request
-        
-      } catch (refreshErr) {
-        auth.logout()
+        await authStore.refreshTokens()
+        originalRequest.headers.Authorization = `Bearer ${authStore.accessToken}`
+        return api(originalRequest)
+      } catch (refreshError) {
+        authStore.logout()
         router.push('/login')
-        return Promise.reject(refreshErr)
+        return Promise.reject(refreshError)
       }
     }
-
-    return Promise.reject(err)
+    return Promise.reject(error)
   }
 )
+
 export default api
