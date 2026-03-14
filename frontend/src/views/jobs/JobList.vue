@@ -4,63 +4,155 @@
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h1 class="text-4xl font-bold tracking-tight">Browse Jobs</h1>
-        <p class="text-neutral-500">Showing {{ paginatedJobs.length }} of {{ filteredJobs.length }} open positions.</p>
+        <p class="text-muted-foreground">Showing {{ paginatedJobs.length }} of {{ filteredJobs.length }} open positions.</p>
       </div>
-      
-      <div class="flex gap-2">
-        <input v-model="filters.search" type="text" placeholder="Search roles..." class="rounded-full border border-neutral-200 bg-white px-6 py-2 text-sm focus:border-emerald-500 focus:outline-none transition-all" />
-        <select v-model="filters.type" class="rounded-full border border-neutral-200 bg-white px-6 py-2 text-sm focus:border-emerald-500 focus:outline-none transition-all">
-          <option value="">All Types</option>
-          <option value="full-time">Full-time</option>
-          <option value="contract">Contract</option>
-          <option value="remote">Remote</option>
-        </select>
+
+      <div class="grid w-full max-w-xl gap-2 sm:grid-cols-[1fr_180px]">
+        <Input
+          v-model="filters.search"
+          type="text"
+          placeholder="Search roles, location, or keywords"
+        />
+
+        <Select v-model="filters.type">
+          <SelectTrigger>
+            <SelectValue placeholder="All Types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="full-time">Full-time</SelectItem>
+            <SelectItem value="contract">Contract</SelectItem>
+            <SelectItem value="remote">Remote</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </div>
+
+    <Separator />
 
     <div v-if="loading" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <div v-for="i in 6" :key="i" class="h-64 animate-pulse rounded-2xl bg-neutral-100"></div>
+      <Card v-for="i in 6" :key="i">
+        <CardHeader class="space-y-3">
+          <Skeleton class="h-5 w-3/4" />
+          <Skeleton class="h-4 w-1/2" />
+        </CardHeader>
+        <CardContent class="space-y-3">
+          <Skeleton class="h-4 w-full" />
+          <Skeleton class="h-4 w-11/12" />
+          <Skeleton class="h-4 w-3/4" />
+        </CardContent>
+        <CardFooter class="flex items-center justify-between">
+          <Skeleton class="h-4 w-24" />
+          <Skeleton class="h-8 w-20" />
+        </CardFooter>
+      </Card>
     </div>
 
-    <div v-else-if="error" class="py-24 text-center">
-      <p class="text-lg text-red-600">{{ error }}</p>
-      <button @click="fetchJobs" class="mt-4 rounded-full bg-neutral-900 px-6 py-2 text-sm font-medium text-white hover:bg-neutral-800 transition-all">
+    <div v-else-if="error" class="py-10">
+      <Alert variant="destructive">
+        <AlertTitle>Could not load jobs</AlertTitle>
+        <AlertDescription>{{ error }}</AlertDescription>
+      </Alert>
+      <Button class="mt-4" variant="outline" @click="fetchJobs">
         Retry
-      </button>
+      </Button>
     </div>
 
-    <div v-else-if="filteredJobs.length === 0" class="py-24 text-center">
-      <p class="text-lg text-neutral-500">No jobs found matching your criteria.</p>
+    <div v-else-if="filteredJobs.length === 0" class="py-10">
+      <Alert>
+        <AlertTitle>No jobs found</AlertTitle>
+        <AlertDescription>
+          Try a broader keyword or switch the job type filter.
+        </AlertDescription>
+      </Alert>
     </div>
 
     <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <div v-for="job in paginatedJobs" :key="job.id" class="group relative rounded-2xl border border-neutral-200 bg-white p-6 transition-all hover:border-emerald-200 hover:shadow-xl">
-        <div class="mb-4 flex items-center justify-between">
-          <div class="h-12 w-12 rounded-xl bg-neutral-100 p-2">
-            <img :src="`https://picsum.photos/seed/job${job.id}/100/100`" alt="Logo" class="h-full w-full object-contain grayscale group-hover:grayscale-0" />
+      <Card
+        v-for="job in paginatedJobs"
+        :key="job.id"
+        class="transition-shadow duration-200 hover:shadow-md"
+      >
+        <CardHeader class="gap-2">
+          <div class="flex items-center justify-between gap-3">
+            <CardTitle class="line-clamp-1 text-lg">{{ job.title }}</CardTitle>
+            <Badge variant="outline">{{ formatType(job.job_type) }}</Badge>
           </div>
-          <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">{{ formatType(job.job_type) }}</span>
-        </div>
-        <h3 class="text-xl font-bold group-hover:text-emerald-600 transition-colors">{{ job.title }}</h3>
-        <p class="text-sm text-neutral-500">{{ companyLabel(job.employer_email) }} • {{ job.location }}</p>
-        <p class="mt-4 line-clamp-2 text-sm text-neutral-600">{{ job.description }}</p>
-        <div class="mt-6 flex items-center justify-between">
-          <span class="text-sm font-medium text-neutral-900">{{ salaryLabel(job.salary_min, job.salary_max) }}</span>
-          <router-link :to="`/jobs/${job.id}`" class="text-sm font-bold text-emerald-600">Details →</router-link>
-        </div>
-      </div>
+          <CardDescription>
+            {{ companyLabel(job.employer_email) }} • {{ job.location }}
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          <p class="line-clamp-3 text-sm text-muted-foreground">
+            {{ job.description }}
+          </p>
+        </CardContent>
+
+        <CardFooter class="items-center justify-between gap-2">
+          <span class="text-sm font-medium">{{ salaryLabel(job.salary_min, job.salary_max) }}</span>
+          <Button as-child variant="link" class="px-0">
+            <RouterLink :to="`/jobs/${job.id}`">View details</RouterLink>
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
 
-    <!-- Pagination -->
-    <div v-if="totalPages > 1" class="flex justify-center gap-2 pt-8">
-      <button v-for="p in totalPages" :key="p" @click="page = p" :class="['h-10 w-10 rounded-full text-sm font-medium transition-all', page === p ? 'bg-neutral-900 text-white' : 'bg-white border border-neutral-200 hover:bg-neutral-50']">
-        {{ p }}
-      </button>
+    <div v-if="totalPages > 1" class="pt-2">
+      <Pagination
+        v-model:page="page"
+        :items-per-page="pageSize"
+        :total="filteredJobs.length"
+        :sibling-count="1"
+        show-edges
+      >
+        <PaginationContent v-slot="{ items }">
+          <PaginationPrevious />
+
+          <template v-for="(item, index) in items" :key="`page-item-${index}`">
+            <PaginationItem
+              v-if="item.type === 'page'"
+              :value="item.value"
+              :is-active="item.value === page"
+            >
+              {{ item.value }}
+            </PaginationItem>
+            <PaginationEllipsis v-else :index="index" />
+          </template>
+
+          <PaginationNext />
+        </PaginationContent>
+      </Pagination>
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { RouterLink } from 'vue-router'
+
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious
+} from '@/components/ui/pagination'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
+
 import { useJobsStore } from '@/stores/jobs'
 import type { Job } from '@/api/jobsApi'
 
@@ -70,7 +162,7 @@ const page = ref(1)
 const pageSize = 9
 const filters = reactive({
   search: '',
-  type: ''
+  type: 'all'
 })
 
 const loading = computed(() => jobsStore.loading)
@@ -88,7 +180,7 @@ const filteredJobs = computed(() => {
       job.location.toLowerCase().includes(search)
 
     const normalizedType = job.job_type.toLowerCase()
-    const matchesType = !type || normalizedType.includes(type)
+  const matchesType = type === 'all' || normalizedType.includes(type)
 
     return matchesSearch && matchesType
   })
