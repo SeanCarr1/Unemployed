@@ -2,6 +2,19 @@
 // Factory function for generic Pinia CRUD stores
 import { ref, type Ref } from 'vue'
 
+function extractErrorMessage(err: unknown, fallback: string): string {
+  if (typeof err === 'object' && err !== null) {
+    const maybeError = err as { detail?: unknown; message?: unknown }
+    if (typeof maybeError.detail === 'string') {
+      return maybeError.detail
+    }
+    if (typeof maybeError.message === 'string') {
+      return maybeError.message
+    }
+  }
+  return fallback
+}
+
 export function useCrudStore<T extends { id: number }, CreatePayload = Partial<T>, UpdatePayload = Partial<T>>(api: {
   list: () => Promise<T[]>,
   get: (id: number) => Promise<T>,
@@ -19,8 +32,8 @@ export function useCrudStore<T extends { id: number }, CreatePayload = Partial<T
     error.value = null
     try {
       items.value = await api.list()
-    } catch (err: any) {
-      error.value = err.detail || err.message || 'Failed to fetch items'
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err, 'Failed to fetch items')
     } finally {
       loading.value = false
     }
@@ -31,8 +44,8 @@ export function useCrudStore<T extends { id: number }, CreatePayload = Partial<T
     error.value = null
     try {
       selected.value = await api.get(id)
-    } catch (err: any) {
-      error.value = err.detail || err.message || 'Failed to fetch item'
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err, 'Failed to fetch item')
     } finally {
       loading.value = false
     }
@@ -45,8 +58,8 @@ export function useCrudStore<T extends { id: number }, CreatePayload = Partial<T
       const item = await api.create(payload)
       items.value.push(item)
       return item
-    } catch (err: any) {
-      error.value = err.detail || err.message || 'Failed to create item'
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err, 'Failed to create item')
       throw err
     } finally {
       loading.value = false
@@ -62,8 +75,8 @@ export function useCrudStore<T extends { id: number }, CreatePayload = Partial<T
       if (idx !== -1) items.value[idx] = item
       if (selected.value && selected.value.id === id) selected.value = item
       return item
-    } catch (err: any) {
-      error.value = err.detail || err.message || 'Failed to update item'
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err, 'Failed to update item')
       throw err
     } finally {
       loading.value = false
@@ -77,8 +90,8 @@ export function useCrudStore<T extends { id: number }, CreatePayload = Partial<T
       await api.remove(id)
       items.value = items.value.filter((i) => i.id !== id)
       if (selected.value && selected.value.id === id) selected.value = null
-    } catch (err: any) {
-      error.value = err.detail || err.message || 'Failed to delete item'
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err, 'Failed to delete item')
       throw err
     } finally {
       loading.value = false

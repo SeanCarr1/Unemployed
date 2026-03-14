@@ -2,8 +2,8 @@
 import { defineStore } from 'pinia'
 import { useCrudStore } from './crudFactory'
 import { applicationsCrudApi } from '@/api/adapter/applications_crud'
-import type { Application, ApplicationPayload } from '@/api/applications'
+import type { Application, ApplicationPayload, ApplicationUpdatePayload } from '@/api/applications'
 
 export const useApplicationsStore = defineStore('applications', () => {
-  return useCrudStore<Application, ApplicationPayload, Partial<Application>>(applicationsCrudApi)
+  return useCrudStore<Application, ApplicationPayload, ApplicationUpdatePayload>(applicationsCrudApi)
 })
