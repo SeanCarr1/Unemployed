@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import api from '@/api/api'
+import { API_BASE_URL } from '@/api/config'
 import axios from 'axios'
 
 type UserRole = 'seeker' | 'employer'
@@ -75,7 +76,7 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     async login(credentials: LoginCredentials): Promise<void> {
-      const response = await axios.post<TokenPairResponse>('http://localhost:8000/auth/jwt/create/', credentials)
+      const response = await axios.post<TokenPairResponse>(`${API_BASE_URL}/auth/jwt/create/`, credentials)
       this.accessToken = response.data.access
       this.refreshToken = response.data.refresh
       localStorage.setItem('accessToken', this.accessToken)
@@ -85,7 +86,7 @@ export const useAuthStore = defineStore('auth', {
       await this.fetchUser()
     },
     async register(payload: RegisterPayload): Promise<void> {
-      await axios.post<void>('http://localhost:8000/auth/users/', payload)
+      await axios.post<void>(`${API_BASE_URL}/auth/users/`, payload)
     },
     async fetchUser(): Promise<void> {
       const response = await api.get<User>('/auth/users/me/')
@@ -94,7 +95,7 @@ export const useAuthStore = defineStore('auth', {
     },
     async refreshTokens(): Promise<void> {
       if (!this.refreshToken) throw new Error('No refresh token')
-      const response = await axios.post<RefreshResponse>('http://localhost:8000/auth/jwt/refresh/', {
+      const response = await axios.post<RefreshResponse>(`${API_BASE_URL}/auth/jwt/refresh/`, {
         refresh: this.refreshToken,
       })
       this.accessToken = response.data.access
