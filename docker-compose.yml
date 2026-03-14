@@ -43,3 +43,4 @@ services:
 
 volumes:
   db_prod_data:
+    name: ${DB_VOLUME_NAME:-unemployed_db_data}
