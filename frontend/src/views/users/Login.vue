@@ -47,7 +47,7 @@ const handleLogin = async () => {
   loading.value = true
   try {
     await authStore.login({
-      username: form.email, // Djoser often uses username field for email if configured
+      email: form.email,
       password: form.password
     })
     toastStore.success('Welcome back!')
