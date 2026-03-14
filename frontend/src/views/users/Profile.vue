@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, onMounted, watch } from 'vue'
+import { computed, reactive, ref, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useApplicationsStore } from '@/stores/applications'
 import { useToastStore } from '@/stores/toast'
