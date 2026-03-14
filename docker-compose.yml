@@ -1,35 +1,41 @@
 services:
-  db-prod:
+  db:
     image: postgres:18-alpine
-    container_name: unemployed_db_prod
+    container_name: unemployed_db
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: unemployed_prod
-      POSTGRES_USER: unemployed_prod_user
-      POSTGRES_PASSWORD: unemployed_prod_pass
+      POSTGRES_DB: unemployed_db
+      POSTGRES_USER: unemployed_user
+      POSTGRES_PASSWORD: unemployed_pass
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U unemployed_user -d unemployed_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - db_prod_data:/var/lib/postgresql/data
 
   backend:
     build:
       context: ./backend
+    restart: unless-stopped
     env_file:
       - ./backend/.env
-    volumes:
-      - ./backend:/app
     ports:
       - "8000:8000"
     depends_on:
-      - db-prod
+      db:
+        condition: service_healthy
 
   frontend:
     build:
       context: ./frontend
+      target: release
+    restart: unless-stopped
     env_file:
       - ./frontend/.env
-    volumes:
-      - ./frontend:/app
     ports:
       - "5173:5173"
     depends_on:
