@@ -2,6 +2,8 @@ from django.test import TestCase
 from django.urls import reverse
 from users.models import CustomUser
 from rest_framework import status
+from rest_framework.test import APIClient, APITestCase
+from typing import Any, cast
 
 class RegistrationTestCase(TestCase):
     """Tests user registration via Djoser with role field."""
@@ -24,10 +26,10 @@ class RegistrationTestCase(TestCase):
 
 
 # --- ADMIN DASHBOARD TESTS ---
-from rest_framework.test import APIClient
-
-class AdminUserListTestCase(TestCase):
+class AdminUserListTestCase(APITestCase):
     """Tests that only admin can list all users via /users/ endpoint."""
+    client: APIClient
+
     def setUp(self):
         self.admin = CustomUser.objects.create_superuser(
             email="admin@example.com",
@@ -41,19 +43,19 @@ class AdminUserListTestCase(TestCase):
             password="userpass",
             role="seeker"
         )
-        self.client = APIClient()
         self.list_url = "/users/"
 
     def test_admin_can_list_users(self):
         self.client.force_authenticate(user=self.admin)
-        response = self.client.get(self.list_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(any(u["email"] == "user@example.com" for u in response.json()["results"]))
+        response = cast(Any, self.client.get(self.list_url))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        results = response.data.get("results", [])
+        self.assertTrue(any(u["email"] == "user@example.com" for u in results))
 
     def test_non_admin_cannot_list_users(self):
         self.client.force_authenticate(user=self.user)
-        response = self.client.get(self.list_url)
-        self.assertEqual(response.status_code, 403)
+        response = cast(Any, self.client.get(self.list_url))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 class LoginFlowTestCase(TestCase):
     """Tests login flow for CustomUser using SimpleJWT."""
