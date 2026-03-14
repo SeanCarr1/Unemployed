@@ -3,6 +3,23 @@
 
 import api from '@/api/api'
 
+interface PaginatedResponse<T> {
+  count: number
+  next: string | null
+  previous: string | null
+  results: T[]
+}
+
+function rethrowApiError(err: unknown): never {
+  if (typeof err === 'object' && err !== null) {
+    const maybeErr = err as { response?: { data?: unknown } }
+    if (typeof maybeErr.response?.data !== 'undefined') {
+      throw maybeErr.response.data
+    }
+  }
+  throw err
+}
+
 
 export interface Application {
     id: number;
@@ -23,13 +40,17 @@ export interface ApplicationPayload {
     cover_letter: File;
 }
 
+export interface ApplicationUpdatePayload {
+  status: 'pending' | 'accepted';
+}
+
 export async function listApplications(): Promise<Application[]> {
   try {
-    const res = await api.get<Application[]>('/applications/')
-    return res.data
+    const res = await api.get<Application[] | PaginatedResponse<Application>>('/applications/')
+    return Array.isArray(res.data) ? res.data : res.data.results
 
-  } catch (err: any) {
-    throw err.response?.data || err
+  } catch (err: unknown) {
+    rethrowApiError(err)
   }
 }
 
@@ -38,8 +59,8 @@ export async function getApplication(id: number): Promise<Application> {
     const res = await api.get<Application>(`/applications/${id}/`)
     return res.data
 
-  } catch (err: any) {
-    throw err.response?.data || err
+  } catch (err: unknown) {
+    rethrowApiError(err)
   }
 }
 
@@ -54,18 +75,18 @@ export async function createApplication(payload: ApplicationPayload): Promise<Ap
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return res.data;
-  } catch (err: any) {
-    throw err.response?.data || err;
+  } catch (err: unknown) {
+    rethrowApiError(err)
   }
 }
 
-export async function updateApplication(id: number, payload: Partial<Application>): Promise<Application> {
+export async function updateApplication(id: number, payload: ApplicationUpdatePayload): Promise<Application> {
   try {
     const res = await api.patch<Application>(`/applications/${id}/`, payload)
     return res.data
 
-  } catch (err: any) {
-    throw err.response?.data || err
+  } catch (err: unknown) {
+    rethrowApiError(err)
   }
 }
 
@@ -73,7 +94,7 @@ export async function deleteApplication(id: number): Promise<void> {
   try {
     await api.delete(`/applications/${id}/`)
     
-  } catch (err: any) {
-    throw err.response?.data || err
+  } catch (err: unknown) {
+    rethrowApiError(err)
   }
 }
