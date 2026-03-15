@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: ${DB_CONTAINER_NAME:-unemployed_db_dev}
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-unemployed_db}
+      POSTGRES_USER: ${POSTGRES_USER:-unemployed_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-unemployed_pass}
+    ports:
+      - "${DB_EXTERNAL_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-unemployed_user} -d ${POSTGRES_DB:-unemployed_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db_dev_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    ports:
+      - "${BACKEND_EXTERNAL_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build:
+      context: ./frontend
+      # For dev you can still use the release stage; it's already set up
+      target: release
+    restart: unless-stopped
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "${FRONTEND_EXTERNAL_PORT:-5173}:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+
+volumes:
+  db_dev_data:
+    name: ${DB_DEV_VOLUME_NAME:-unemployed_db_data_dev}
