@@ -28,11 +28,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/venv
 
   frontend:
     build:
       context: ./frontend
-      target: release
     restart: unless-stopped
     env_file:
       - ./frontend/.env
@@ -40,7 +42,12 @@ services:
       - "${FRONTEND_EXTERNAL_PORT:-5173}:5173"
     depends_on:
       - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/dist
 
 volumes:
   db_prod_data:
     name: ${DB_VOLUME_NAME:-unemployed_db_data}
+    
