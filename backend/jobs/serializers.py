@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.request import Request
 from .models import Job
 
 class JobSerializer(serializers.ModelSerializer):
@@ -7,13 +6,12 @@ class JobSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Job
-        fields = "__all__"
+        fields = ['id', 'title', 'description', 'location', 'salary_min', 'salary_max', 'job_type',
+          'employer', 'employer_email', 'posted_at']
         read_only_fields = ['posted_at', 'employer']
 
     def create(self, validated_data):
-        request = self.context.get("request")
-        if not isinstance(request, Request):
-            raise serializers.ValidationError({"detail": "Request context is required."})
-        validated_data['employer'] = request.user
+        validated_data['employer'] = self.context['request'].user
         return super().create(validated_data)
+
         
