@@ -28,4 +28,7 @@ dist/
 # System files
 Thumbs.db
 .DS_Store
-.github
+.github/
+
+spec.md
+
