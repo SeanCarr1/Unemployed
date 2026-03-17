@@ -1,6 +1,6 @@
 # Unemployed
 
-A Django + Vue fullstack web application for job seekers and employers.
+A modern job board platform connecting job seekers with employers through an intuitive application management system. Built with Django REST Framework and Vue 3.
 ![alt text](image.png)
 
 ## Features
@@ -13,12 +13,20 @@ A Django + Vue fullstack web application for job seekers and employers.
 - Automated tests for backend and frontend
 
 ## Tech Stack
-- Backend: Django, Django REST Framework
-- Databse: PostgreSQL
-- Frontend: Vue 3, TypeScript, Pinia, Vite
-- Auth: SimpleJWT
-- State: Pinia
-- Styling: Tailwind CSS, Shadcn-vue
-- Testing: Django TestCase, DRF APIClient, Vitest
+**Backend**
+- Django 5.2, Django REST Framework
+- PostgreSQL
+- SimpleJWT for authentication
+
+**Frontend**
+- Vue 3 (Composition API) + TypeScript
+- Pinia (state management)
+- Tailwind CSS + shadcn-vue
+- Vite
+
+**DevOps**
+- Docker + Docker Compose
+- Django TestCase, DRF APIClient (backend tests)
+- Vitest (frontend tests)
 
 
