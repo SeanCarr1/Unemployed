@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
-const JobList = () => import('@/views/jobs/JobList.vue')
-const JobDetail = () => import('@/views/jobs/JobDetail.vue')
-const JobCreate = () => import('@/views/jobs/JobCreate.vue')
-const JobEdit = () => import('@/views/jobs/JobEdit.vue')
+const JobList = () => import('@/features/jobs/views/JobList.vue')
+const JobDetail = () => import('@/features/jobs/views/JobDetail.vue')
+const JobCreate = () => import('@/features/jobs/views/JobCreate.vue')
+const JobEdit = () => import('@/features/jobs/views/JobEdit.vue')
 
 const router = createRouter({
   history: createWebHistory(),
