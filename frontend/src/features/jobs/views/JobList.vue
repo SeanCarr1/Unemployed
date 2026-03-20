@@ -68,34 +68,35 @@
     </div>
 
     <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <Card
-        v-for="job in paginatedJobs"
-        :key="job.id"
-        class="transition-shadow duration-200 hover:shadow-md"
-      >
-        <CardHeader class="gap-2">
-          <div class="flex items-center justify-between gap-3">
-            <CardTitle class="line-clamp-1 text-lg">{{ job.title }}</CardTitle>
-            <Badge variant="outline">{{ formatType(job.job_type) }}</Badge>
-          </div>
-          <CardDescription>
-            {{ companyLabel(job.employer_email) }} • {{ job.location }}
-          </CardDescription>
-        </CardHeader>
+      <RouterLink
+          v-for="job in paginatedJobs"
+          :key="job.id" :to="`/jobs/${job.id}`">
+        <Card
+          class="transition-shadow duration-200 hover:shadow-md"
+        >
+          <CardHeader class="gap-2">
+            <div class="flex items-center justify-between gap-3">
+              <CardTitle class="line-clamp-1 text-lg">{{ job.title }}</CardTitle>
+              <Badge variant="outline">{{ formatType(job.job_type) }}</Badge>
+            </div>
+            <CardDescription>
+              {{ companyLabel(job.employer_email) }} • {{ job.location }}
+            </CardDescription>
+          </CardHeader>
 
-        <CardContent>
-          <p class="line-clamp-3 text-sm text-muted-foreground">
-            {{ job.description }}
-          </p>
-        </CardContent>
+          <CardContent>
+            <p class="line-clamp-3 text-sm text-muted-foreground">
+              {{ job.description }}
+            </p>
+          </CardContent>
 
-        <CardFooter class="items-center justify-between gap-2">
-          <span class="text-sm font-medium">{{ salaryLabel(job.salary_min, job.salary_max) }}</span>
-          <Button as-child variant="link" class="px-0">
-            <RouterLink :to="`/jobs/${job.id}`">View details</RouterLink>
-          </Button>
-        </CardFooter>
-      </Card>
+          <CardFooter class="items-center justify-between gap-2">
+            <span class="text-sm font-medium">{{ salaryLabel(job.salary_min, job.salary_max) }}</span>
+            <Button as-child variant="link" class="px-0">
+            </Button>
+          </CardFooter>
+        </Card>
+      </RouterLink>
     </div>
 
     <div v-if="totalPages > 1" class="pt-2">

@@ -29,7 +29,7 @@
             <p class="text-sm text-neutral-500">{{ formatType(job.job_type) }} • {{ job.location }}</p>
           </div>
           <div class="flex gap-2">
-            <button class="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium hover:bg-neutral-50">Edit</button>
+            <button @click="editJob(job.id)" class="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium hover:bg-neutral-50">Edit</button>
             <button @click="deleteJob(job.id)" class="rounded-lg border border-red-100 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50">Delete</button>
           </div>
         </div>
@@ -117,12 +117,14 @@
 </template>
 
 <script setup lang="ts">
+import JobForm from '@/features/jobs/components/jobForm.vue'
 import { computed, reactive, ref, onMounted } from 'vue'
 import type { JobPayload } from '@/api/jobsApi'
 import { useAuthStore } from '@/stores/auth'
 import { useJobsStore } from '@/stores/jobs'
 import { useApplicationsStore } from '@/stores/applications'
 import { useToastStore } from '@/stores/toast'
+import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const jobsStore = useJobsStore()
@@ -133,6 +135,7 @@ const jobsLoading = computed(() => jobsStore.loading)
 const jobsError = computed(() => jobsStore.error)
 const applicationsLoading = computed(() => applicationsStore.loading)
 const applicationsError = computed(() => applicationsStore.error)
+const router = useRouter()
 
 const jobs = computed(() => {
   const email = authStore.user?.email
@@ -224,5 +227,10 @@ const formatType = (value: string) => {
   return value.replace('-', ' ').replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
+const editJob = (id: number) => router.push({ name: 'JobEdit', params: { id } })
+
 onMounted(fetchData)
+
+
 </script>
+

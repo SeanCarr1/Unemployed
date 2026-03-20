@@ -2,8 +2,8 @@
   <div class="mx-auto max-w-3xl space-y-6 py-10">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold tracking-tight">Create Job</h1>
-        <p class="text-neutral-500">Publish a new listing for candidates.</p>
+        <h1 class="text-3xl font-bold tracking-tight">{{ isEdit ? 'Edit Job' : 'Create Job' }}</h1>
+        <p class="text-neutral-500">{{ isEdit ? 'Edit an existing job' : 'Publish a new listing for candidates.' }}</p>
       </div>
       <router-link to="/employer/dashboard" class="rounded-full border border-neutral-200 px-4 py-2 text-sm font-medium hover:bg-neutral-50">
         Back
@@ -47,18 +47,19 @@
       </div>
 
       <button :disabled="submitting" type="submit" class="w-full rounded-xl bg-neutral-900 py-3 font-medium text-white hover:bg-neutral-800 disabled:opacity-50">
-        {{ submitting ? 'Publishing...' : 'Publish Job' }}
+        {{ isEdit ? 'Save Changes' : 'Publish Job' }}
       </button>
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Job, JobPayload } from '@/api/jobsApi'
 import { useJobsStore } from '@/stores/jobs'
 import { useToastStore } from '@/stores/toast'
+
 
 
 const router = useRouter()
@@ -66,6 +67,8 @@ const jobsStore = useJobsStore()
 const toastStore = useToastStore()
 const submitting = ref(false)
 
+
+const isEdit = computed(() => !!props.job?.id)
 // Accepts job data for editing, or null for creating.
 const props = defineProps<{
   job?: Job | null
@@ -97,7 +100,11 @@ watch(() => props.job, (job) => {
   } else {
     Object.assign(form, defaultForm)
   }
-})
+},
+  {
+    immediate: true
+  }
+)
 
 // Validates and submits the job form for create or edit.
 const handleSubmit = async () => {

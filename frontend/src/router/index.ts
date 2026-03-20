@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 const JobList = () => import('@/features/jobs/views/JobList.vue')
 const JobDetail = () => import('@/features/jobs/views/JobDetail.vue')
 const JobCreate = () => import('@/features/jobs/views/JobCreate.vue')
-const JobEdit = () => import('@/features/jobs/views/JobEdit.vue')
+const JobEdit = () => import('@/features/jobs/components/JobEdit.vue')
 
 const router = createRouter({
   history: createWebHistory(),
@@ -57,7 +57,7 @@ const router = createRouter({
     {
       path: '/employer/dashboard',
       name: 'EmployerDashboard',
-      component: () => import('@/views/employer/EmployerDashboard.vue'),
+      component: () => import('@/features/employer/views/EmployerDashboard.vue'),
       meta: { requiresAuth: true, role: 'employer' },
     },
   ],
