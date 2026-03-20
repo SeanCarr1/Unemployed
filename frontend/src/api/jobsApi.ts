@@ -81,6 +81,8 @@ export async function updateJob(id: number, payload: Partial<JobPayload>): Promi
   }
 }
 
+
+
 export async function deleteJob(id: number): Promise<void> {
   try {
     await api.delete(`/jobs/${id}/`)
@@ -88,4 +90,36 @@ export async function deleteJob(id: number): Promise<void> {
   } catch (err: unknown) {
     rethrowApiError(err)
   }
+}
+
+function buildQuery(params: Record<string, unknown>) {
+  const searchParams = new URLSearchParams()
+  Object.entries(params).forEach(([k,v]) => {
+    if (v != null) searchParams.append(k, String(v))
+  })
+  return `?${searchParams.toString()}`
+}
+
+export async function listJobsPaginated(page = 1, pageSize = 10) {
+  const res = await api.get<Job[] | PaginatedResponse<Job>>(
+    `/jobs/${buildQuery({page, page_size: pageSize})}`
+  )
+  return Array.isArray(res.data) ? res.data : res.data.results
+}
+
+export async function listJobsWithQuery(params: Record<string, unknown>) {
+  const res = await api.get<Job[] | PaginatedResponse<Job>>(`/jobs/${buildQuery(params)}`)
+  return Array.isArray(res.data) ? res.data : res.data.results
+}
+
+export async function searchJobs(term: string) {
+  return listJobsWithQuery({search: term})
+}
+
+export async function listJobsByEmployer(employerId: number) {
+  return listJobsWithQuery({employer: employerId})
+}
+
+export async function listMyJobs() {
+  return listJobsWithQuery({mine: true}) // use whichever backend param you define
 }

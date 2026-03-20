@@ -98,3 +98,37 @@ export async function deleteApplication(id: number): Promise<void> {
     rethrowApiError(err)
   }
 }
+
+function buildQuery(params: Record<string, unknown>) {
+  const searchParams = new URLSearchParams()
+  Object.entries(params).forEach(([key, value]) => {
+    if (value != null) searchParams.append(key, String(value))
+  })
+  return `?${searchParams.toString()}`
+}
+
+export async function listApplicationsPaginated(page = 1, pageSize = 10) {
+  const res = await api.get<Application[] | PaginatedResponse<Application>>(
+    `/applications/${buildQuery({ page, page_size: pageSize })}`
+  )
+  return Array.isArray(res.data) ? res.data : res.data.results
+}
+
+export async function listApplicationsWithQuery(params: Record<string, unknown>) {
+  const res = await api.get<Application[] | PaginatedResponse<Application>>(
+    `/applications/${buildQuery(params)}`
+  )
+  return Array.isArray(res.data) ? res.data : res.data.results
+}
+
+export async function searchApplications(term: string) {
+  return listApplicationsWithQuery({ search: term })
+}
+
+export async function listApplicationsByJob(jobId: number) {
+  return listApplicationsWithQuery({ job: jobId })
+}
+
+export async function listMyApplications() {
+  return listApplicationsWithQuery({ mine: true })
+}

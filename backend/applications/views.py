@@ -33,3 +33,5 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(seeker=self.request.user)
+
+        

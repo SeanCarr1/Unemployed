@@ -56,9 +56,10 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import type { JobPayload } from '@/api/jobsApi'
+import type { Job, JobPayload } from '@/api/jobsApi'
 import { useJobsStore } from '@/stores/jobs'
 import { useToastStore } from '@/stores/toast'
+
 
 const router = useRouter()
 const jobsStore = useJobsStore()
@@ -67,7 +68,7 @@ const submitting = ref(false)
 
 // Accepts job data for editing, or null for creating.
 const props = defineProps<{
-    job: JobPayload 
+  job?: Job | null
 }>()
 
 const defaultForm: JobPayload = {
@@ -81,15 +82,22 @@ const defaultForm: JobPayload = {
 
 const form = reactive<JobPayload>({ ...defaultForm })
 
+
 // Watches job prop and updates form fields for editing or resets for creating.
-watch( () => props.job, (job) => {
-        if(job) {
-            Object.assign(form, job)
-        } else {
-            Object.assign(form, defaultForm)
-        }
-    }
-)
+watch(() => props.job, (job) => {
+  if (job) {
+    Object.assign(form, {
+      title: job.title,
+      description: job.description,
+      location: job.location,
+      salary_min: job.salary_min,
+      salary_max: job.salary_max,
+      job_type: job.job_type,
+    })
+  } else {
+    Object.assign(form, defaultForm)
+  }
+})
 
 // Validates and submits the job form for create or edit.
 const handleSubmit = async () => {
@@ -99,12 +107,10 @@ const handleSubmit = async () => {
 
   submitting.value = true
   try {
-    if (props.job && 'id' in props.job) {
-      // Edit mode
+    if (props.job?.id) {
       await jobsStore.update(props.job.id, { ...form })
       toastStore.success('Job updated successfully')
     } else {
-      // Create mode
       await jobsStore.create({ ...form })
       toastStore.success('Job created successfully')
     }
